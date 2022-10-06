@@ -1,0 +1,57 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Publish
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  compile:
+    name: dart compile exe
+    strategy:
+      matrix:
+        include:
+          - runs-on: ubuntu-latest
+            binary-name: spotty_linux_amd64
+          - runs-on: macos-latest
+            binary-name: spotty_macos_amd64
+          - runs-on: windows-latest
+            binary-name: spotty_windows.exe
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: dart-lang/setup-dart@v1.3
+      - run: dart pub get
+      - run: mkdir ${{ matrix.runs-on }}
+      - run: dart compile exe bin/spotty.dart -o ${{ matrix.runs-on }}/${{ matrix.binary-name }}
+      - uses: actions/upload-artifact@v3.1.0
+        with:
+          name: bin-${{ matrix.runs-on }}
+          path: ${{ matrix.runs-on }}
+
+  release:
+    needs: compile
+    name: github release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3.0.0
+        with:
+          name: bin-ubuntu-latest
+          path: bin-linux
+      - uses: actions/download-artifact@v3.0.0
+        with:
+          name: bin-macos-latest
+          path: bin-macos
+      - uses: actions/download-artifact@v3.0.0
+        with:
+          name: bin-windows-latest
+          path: bin-windows
+      - uses: softprops/action-gh-release@v0.1.14
+        with:
+          draft: true
+          files: bin-*/*
