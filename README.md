@@ -5,6 +5,26 @@ Console weather app.
 ## Usage
 
 ```bash
+$ spotty --help
+A command-line utility to get current weather
+
+Usage: spotty <location>
+
+Global options:
+    --[no-]debug    enable debug mode
+-t, --temp_unit     temperature units
+                    [celsius (default), fahrenheit]
+-w, --wind_unit     wind speed units
+                    [kmh (default), ms, mph, kn]
+-p, --prec_unit     precipitation units
+                    [mm (default), inch]
+
+See https://github.com/amka/spotty for detailed documentation.
+```
+
+## Example:
+
+```bash
 $ spotty london
 1: London, United Kingdom
 2: London, Canada

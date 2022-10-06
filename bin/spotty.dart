@@ -5,9 +5,36 @@ import 'package:spotty/spotty.dart';
 
 void main(List<String> arguments) async {
   Console.init();
-  final parser = ArgParser()..addFlag('debug', help: 'enable debug mode');
+  final parser = ArgParser()
+    ..addFlag('debug', help: 'enable debug mode')
+    ..addOption(
+      'temp_unit',
+      abbr: 't',
+      defaultsTo: 'celsius',
+      allowed: ['celsius', 'fahrenheit'],
+      help: 'temperature units',
+    )
+    ..addOption(
+      'wind_unit',
+      abbr: 'w',
+      defaultsTo: 'kmh',
+      allowed: ['kmh', 'ms', 'mph', 'kn'],
+      help: 'wind speed units',
+    )
+    ..addOption(
+      'prec_unit',
+      abbr: 'p',
+      defaultsTo: 'mm',
+      allowed: ['mm', 'inch'],
+      help: 'precipitation units',
+    );
 
-  ArgResults argResults = parser.parse(arguments);
+  ArgResults argResults;
+  try {
+    argResults = parser.parse(arguments);
+  } catch (e) {
+    return printUsage(parser);
+  }
 
   if (argResults.rest.isEmpty) {
     return print('No location provided.');
@@ -35,4 +62,12 @@ void main(List<String> arguments) async {
   }
 
   print('Weather: ${weather.temperature.toString()} °C');
+}
+
+void printUsage(ArgParser parser) {
+  print('A command-line utility to get current weather\n');
+  print('Usage: spotty <location>\n');
+  print('Global options:');
+  print(parser.usage);
+  print("\nSee https://github.com/amka/spotty for detailed documentation.");
 }
