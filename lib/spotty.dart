@@ -14,6 +14,8 @@ Future<List<Location>?> getCoordinates(String locationName) async {
   if (result.statusCode != HttpStatus.ok) return null;
 
   final jsonBody = jsonDecode(result.body) as Map<String, dynamic>;
+  if (jsonBody['results'] == null) return null;
+
   return jsonBody['results']
       .map<Location>((item) => Location.fromJson(item))
       .toList();
