@@ -20,4 +20,9 @@ class Location {
         country: json['country'],
         countryCode: json['country_code'],
       );
+
+  @override
+  String toString() {
+    return '<Location: $name, $country>';
+  }
 }

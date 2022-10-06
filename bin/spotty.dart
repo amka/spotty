@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:args/args.dart';
 import 'package:console/console.dart';
 import 'package:spotty/models/location.dart';
@@ -5,29 +7,7 @@ import 'package:spotty/spotty.dart';
 
 void main(List<String> arguments) async {
   Console.init();
-  final parser = ArgParser()
-    ..addFlag('debug', help: 'enable debug mode')
-    ..addOption(
-      'temp_unit',
-      abbr: 't',
-      defaultsTo: 'celsius',
-      allowed: ['celsius', 'fahrenheit'],
-      help: 'temperature units',
-    )
-    ..addOption(
-      'wind_unit',
-      abbr: 'w',
-      defaultsTo: 'kmh',
-      allowed: ['kmh', 'ms', 'mph', 'kn'],
-      help: 'wind speed units',
-    )
-    ..addOption(
-      'prec_unit',
-      abbr: 'p',
-      defaultsTo: 'mm',
-      allowed: ['mm', 'inch'],
-      help: 'precipitation units',
-    );
+  final parser = createArgsParser();
 
   ArgResults argResults;
   try {
@@ -37,31 +17,61 @@ void main(List<String> arguments) async {
   }
 
   if (argResults.rest.isEmpty) {
-    return print('No location provided.');
+    print('No location provided.');
+    exit(404);
   }
 
-  final locationName = argResults.rest[0];
+  final locationName = argResults.rest.first;
   final locations = await getCoordinates(locationName);
 
   if (locations == null) {
-    return print('Location not found.');
+    print('Location not found.');
+    exit(404);
   }
 
-  var chooser = Chooser<Location>(
-    locations,
-    message: 'Select desired location: ',
-    formatter: (choice, index) => '$index: ${choice.name}, ${choice.country}',
-  );
-  var location = chooser.chooseSync();
-  print('Selected location is ${location.name}');
+  var location = locations.first;
+  if (argResults['select']) {
+    var chooser = Chooser<Location>(
+      locations,
+      message: 'Select location: ',
+      formatter: (choice, index) =>
+          '${index.toString().padLeft(2)}: ${choice.name}, ${choice.country}',
+    );
+    location = chooser.chooseSync();
+  }
 
   final weather = await getCurrentWeather(location);
 
   if (weather == null) {
-    return print('Couldn\'t get weather for given location: $location');
+    print('Couldn\'t get weather for the given location: $location');
+    exit(400);
   }
 
-  print('Weather: ${weather.temperature.toString()} °C');
+  printWeather(location, weather);
+}
+
+ArgParser createArgsParser() {
+  return ArgParser()
+    ..addFlag('debug', help: 'enable debug mode')
+    ..addOption('temp_unit',
+        abbr: 't',
+        defaultsTo: 'celsius',
+        allowed: ['celsius', 'fahrenheit'],
+        help: 'temperature units')
+    ..addOption('wind_unit',
+        abbr: 'w',
+        defaultsTo: 'kmh',
+        allowed: ['kmh', 'ms', 'mph', 'kn'],
+        help: 'wind speed units')
+    ..addOption('prec_unit',
+        abbr: 'p',
+        defaultsTo: 'mm',
+        allowed: ['mm', 'inch'],
+        help: 'precipitation units')
+    ..addFlag('select',
+        abbr: 's',
+        help:
+            'select from found locations, otherwise first found will be used');
 }
 
 void printUsage(ArgParser parser) {
