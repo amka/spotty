@@ -22,7 +22,7 @@ Global options:
 See https://github.com/amka/spotty for detailed documentation.
 ```
 
-## Example:
+## Example
 
 ```bash
 $ spotty london
@@ -40,3 +40,7 @@ Select desired location: 1
 Selected location is London
 Weather: 8.6 °C
 ```
+
+## Weather Data
+
+[Weather data provided by Open-Meteo.com](https://open-meteo.com/).
