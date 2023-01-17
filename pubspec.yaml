@@ -1,5 +1,5 @@
 name: spotty
-description: A sample command-line application.
+description: Weather in command-line.
 version: 1.0.0
 # homepage: https://www.example.com
 
@@ -13,5 +13,5 @@ dependencies:
   http: ^0.13.5
 
 dev_dependencies:
-  lints: ^2.0.0
-  test: ^1.16.0
+  lints: ^2.0.1
+  test: ^1.22.2
