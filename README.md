@@ -2,6 +2,10 @@
 
 Console weather app.
 
+![Spotty Preview](https://user-images.githubusercontent.com/519146/212867694-e9bb501d-7809-4537-b4d9-07520c1cf62e.gif)
+
+
+
 ## Usage
 
 ```bash
